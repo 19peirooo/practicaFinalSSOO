@@ -114,11 +114,28 @@ void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps) {
     printf("Bytemap de bloques:\n");
     for (int i = 0; i < 25; i++) {
-        printf("%u ", ext_bytemaps->bmap_bloques[i]);
+        printf("%d ", ext_bytemaps->bmap_bloques[i]);
     }
     printf("\nBytemap de inodos:\n");
     for (int i = 0; i < MAX_INODOS; i++) {
-        printf("%u ", ext_bytemaps->bmap_inodos[i]);
+        printf("%d ", ext_bytemaps->bmap_inodos[i]);
     }
     printf("\n");
+}
+
+void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos) {
+	for (int i = 0; i < MAX_FICHEROS; i++){
+		if (directorio->dir_inodo != NULL_INODO) {
+			printf("Nombre: %s, Tamaño: %d, inodo: %d, Bloques: ",
+			directorio[i].dir_nfich, 
+			inodos->blq_inodos[directorio[i].dir_inodo].size_fichero,
+			inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque);
+			for (int j = 0; j < MAX_NUMS_BLOQUE_INODO; j++) {
+				if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j] != NULL_BLOQUE) {
+					printf("%d ", inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j]);
+				}
+			}
+			printf("\n");
+		}
+	}
 }
