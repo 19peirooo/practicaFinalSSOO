@@ -93,5 +93,13 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 	}
 
 	return esComandoValido;
+}
 
+void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
+	printf("Informacion del Superbloque: ");
+	printf("Inodos: %d\n", psup->s_inodes_count);
+	printf("Bloques: %d\n", psup->s_blocks_count);
+	printf("Bloques Libres: &d\n", psup->s_free_blocks_count);
+	printf("Primer Bloque: %d\n", psup->s_first_data_block);
+	printf("Tamaño del Bloque: %d\n", psup->s_block_size);
 }
