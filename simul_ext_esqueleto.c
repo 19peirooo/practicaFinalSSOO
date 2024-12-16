@@ -110,3 +110,15 @@ void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
 	printf("Primer Bloque: %d\n", psup->s_first_data_block);
 	printf("Tamaño del Bloque: %d\n", psup->s_block_size);
 }
+
+void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps) {
+    printf("Bytemap de bloques:\n");
+    for (int i = 0; i < 25; i++) {
+        printf("%u ", ext_bytemaps->bmap_bloques[i]);
+    }
+    printf("\nBytemap de inodos:\n");
+    for (int i = 0; i < MAX_INODOS; i++) {
+        printf("%u ", ext_bytemaps->bmap_inodos[i]);
+    }
+    printf("\n");
+}
