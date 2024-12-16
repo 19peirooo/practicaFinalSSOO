@@ -83,13 +83,20 @@ int main(int argc , char** argv) {
 
 int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argumento2){
 	int esComandoValido = 0;
+	sscanf(strcomando, "%s %s %s", orden, argumento1, argumento2);
 
-	if (strcmp(strcomando, "info") == 0){
+	if (strcmp(orden, "info") == 0){
 		if (argumento1 == NULL && argumento2 == NULL){
 			esComandoValido = 1;
 		} else {
 			printf("Demasiados argumentos");
 		}
+	} else if (strcmp(orden, "bytemaps") == 0){
+		if (argumento1 == NULL && argumento2 == NULL){
+			esComandoValido = 1;
+		} else {
+			printf("Demasiados argumentos");
+		} 
 	}
 
 	return esComandoValido;
