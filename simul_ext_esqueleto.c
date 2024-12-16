@@ -43,6 +43,7 @@ int main(int argc , char** argv) {
     int entradadir;
     int grabardatos;
     FILE *fent;
+	
     // Lectura del fichero completo de una sola vez
     fent = fopen("particion.bin","r+b");
     fread(&datosfich, SIZE_BLOQUE, MAX_BLOQUES_PARTICION, fent);     
@@ -84,8 +85,10 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 	int esComandoValido = 0;
 
 	if (strcmp(strcomando, "info") == 0){
-		if (argumento1 == null && argumento2 == null){
+		if (argumento1 == NULL && argumento2 == NULL){
 			esComandoValido = 1;
+		} else {
+			printf("Demasiados argumentos");
 		}
 	}
 
