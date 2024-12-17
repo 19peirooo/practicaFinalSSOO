@@ -8,19 +8,12 @@
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps);
 int ComprobarComando(char *strcomando, char *orden, char *argumento1, char *argumento2);
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup);
-int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
-              char *nombre);
+int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombre);
 void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos);
-int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
-              char *nombreantiguo, char *nombrenuevo);
-int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, 
-             EXT_DATOS *memdatos, char *nombre);
-int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
-           EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
-           char *nombre,  FILE *fich);
-int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,
-           EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock,
-           EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich);
+int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,  char *nombreantiguo, char *nombrenuevo);
+int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *memdatos, char *nombre);
+int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, char *nombre,  FILE *fich);
+int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich);
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich);
 void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich);
 void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
@@ -89,14 +82,20 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 		if (argumento1 == NULL && argumento2 == NULL){
 			esComandoValido = 1;
 		} else {
-			printf("Demasiados argumentos");
+			printf("ERROR: Demasiados argumentos\n");
 		}
-	} else if (strcmp(orden, "bytemaps") == 0){
+	} else if (strcmp(orden, "dir") == 0){
 		if (argumento1 == NULL && argumento2 == NULL){
 			esComandoValido = 1;
 		} else {
-			printf("Demasiados argumentos");
+			printf("ERROR: Demasiados argumentos\n");
 		} 
+	} else if (strcmp(orden, "rename")) {
+		if ((argumento1 != NULL && argumento2 != NULL)) {
+			esComandoValido = 1;
+		} else {
+			printf("ERROR: Argumentos Insuficientes\n");
+		}
 	}
 
 	return esComandoValido;
@@ -137,5 +136,38 @@ void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos) {
 			}
 			printf("\n");
 		}
+	}
+}
+
+int BuscaFich(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, char *nombre){
+	int ficheroEncontrado = -1;
+	for (int i = 0; i < MAX_FICHEROS; i++){
+		if (directorio[i].dir_inodo != NULL_INODO) {
+			if (strcmp(directorio[i].dir_nfich,nombre) == 0){
+				ficheroEncontrado = i;
+			}
+		}
+	}
+	return ficheroEncontrado;
+}
+
+int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,  char *nombreantiguo, char *nombrenuevo) {
+	int exito = 0;
+	int posFichero = BuscaFich(directorio,inodos,nombreantiguo);
+	if (posFichero != -1){
+		if (BuscaFich(directorio,inodos,nombreantiguo) == -1) {
+			if (strlen(nombrenuevo) < LEN_NFICH) {
+				strcpy(directorio[posFichero].dir_nfich,nombrenuevo);
+				directorio[posFichero].dir_nfich[LEN_NFICH - 1] = '\0';	
+				exito = 1;
+			} else {
+				printf("ERROR: Nuevo nombre para el fichero es demasiado largo \n")
+			}
+			
+		} else {
+			printf("ERROR: El fichero %s ya existe\n", nombrenuevo);
+		}
+	} else {
+		printf("ERROR: No se ha encontrado el fichero %s\n", nombreantiguo);
 	}
 }
