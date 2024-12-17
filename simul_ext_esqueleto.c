@@ -83,18 +83,26 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 			esComandoValido = 1;
 		} else {
 			printf("ERROR: Demasiados argumentos\n");
-		}
+ 		}
 	} else if (strcmp(orden, "dir") == 0){
 		if (argumento1 == NULL && argumento2 == NULL){
 			esComandoValido = 1;
 		} else {
 			printf("ERROR: Demasiados argumentos\n");
 		} 
-	} else if (strcmp(orden, "rename")) {
+	} else if (strcmp(orden, "rename") == 0) {
 		if ((argumento1 != NULL && argumento2 != NULL)) {
 			esComandoValido = 1;
 		} else {
 			printf("ERROR: Argumentos Insuficientes\n");
+		}
+	} else if (strcmp(orden, "imprimir") == 0) {
+		if (argumento1 == NULL) {
+			printf("ERROR:  Argumentos Insuficientes\n");
+		} else if (argumento1 != NULL && argumento2 != NULL) {
+			printf("ERROR: Demasiados Argumentos")
+		} else {
+			esComandoValido = 1;
 		}
 	}
 
@@ -170,4 +178,21 @@ int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,  char *nombre
 	} else {
 		printf("ERROR: No se ha encontrado el fichero %s\n", nombreantiguo);
 	}
+
+	return exito;
+
+}
+
+int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *memdatos, char *nombre) {
+	int exito = 0;
+	
+	if (BuscaFich(directorio,inodos,nombre) == -1) {
+		printf("ERROR: Fichero")
+	}
+
+	return exito;
+}
+
+int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, char *nombre,  FILE *fich) {
+	
 }
