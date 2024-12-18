@@ -91,23 +91,37 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 			printf("ERROR: Demasiados argumentos\n");
 		} 
 	} else if (strcmp(orden, "rename") == 0) {
-		if ((numArgs == 3)) {
+		if (numArgs == 3) {
 			esComandoValido = 1;
+		} else if (numArgs > 3){
+			printf("ERROR: Demasiados Argumentos\n");
 		} else {
 			printf("ERROR: Argumentos Insuficientes\n");
 		}
 	} else if (strcmp(orden, "imprimir") == 0) {
 		if (numArgs == 1) {
 			printf("ERROR:  Argumentos Insuficientes\n");
-		} else if (numArgs == 3) {
+		} else if (numArgs >= 3) {
 			printf("ERROR: Demasiados Argumentos\n");
-		} else {
+		} else if (numArgs == 2){
 			esComandoValido = 1;
 		}
 	} else if (strcmp(orden, "remove") == 0){
-
+		if (numArgs == 1) {
+			printf("ERROR:  Argumentos Insuficientes\n");
+		} else if (numArgs >= 3) {
+			printf("ERROR: Demasiados Argumentos\n");
+		} else if (numArgs == 2){
+			esComandoValido = 1;
+		}
 	} else if (strcmp(orden, "copy") == 0){
-
+		if (numArgs == 3) {
+			esComandoValido = 1;
+		} else if (numArgs > 3){
+			printf("ERROR: Demasiados Argumentos\n");
+		} else {
+			printf("ERROR: Argumentos Insuficientes\n");
+		}
 	} else {
 		printf("ERROR: Comando %s no existe\n", orden);
 	}
@@ -238,7 +252,6 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 		memset(directorio[posFichero].dir_nfich,0,LEN_NFICH); 
 		directorio->dir_inodo = NULL_INODO;
 
-		//Actualiza los cambios
 	}
 
 
@@ -246,7 +259,8 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 }
 
 int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
-	return 0;
+	int exito = 0;
+	return exito;
 }
 
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich){
