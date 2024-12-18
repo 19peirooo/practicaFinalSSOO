@@ -108,7 +108,7 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 		printf("ERROR: Comando %s no existe\n", orden);
 	}
 
-	return esComandoValido;s
+	return esComandoValido;
 }
 
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
@@ -209,7 +209,31 @@ int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *mem
 }
 
 int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, char *nombre,  FILE *fich) {
-	return 0;
+	int exito = 0;
+	int posFichero = BuscaFich(directorio,inodos,nombre);
+
+	if (posFichero == -1) {
+		printf("ERROR: Fichero %s no encontrado\n", nombre);
+	} else {
+		//Liberacion de bloques
+		EXT_SIMPLE_INODE *inodo = &inodos.blq_inodos[directorio[posFichero].dir_inodo];
+		for (int i = 0; i < MAX_NUMS_BLOQUE_INODO; i++) {
+			if (inodo->i_nbloque[i] != NULL_BLOQUE){
+				ext_superblock->s_free_blocks_count++;
+				ext_bytemaps->bmap_bloques[inodo->i_nbloque[i]] = 0;
+				inodo->i_nbloque[i] = NULL_BLOQUE;
+			}
+		}
+
+		//Liberar inodo
+
+		//Eliminar entrada
+
+		//Actualiza los cambios
+	}
+
+
+	return exito;
 }
 
 int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
@@ -225,5 +249,13 @@ void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich){
 	return 0;
 }
 void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
-	return 0;
+	//Movemos el puntero al inicio del primer bloque
+	fseek(fich,PRIM_BLOQUE_DATOS * SIZE_BLOQUE, SEEK_SET);
+
+	//Escribimos los datos
+	for (int i = 0; i < MAX_BLOQUES_DATOS; i++) {
+		fwrite(&memdatos[i],SIZE_BLOQUE,1,fich);
+	}
+
+	fflush(fich);
 }
