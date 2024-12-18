@@ -104,6 +104,10 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 		} else {
 			esComandoValido = 1;
 		}
+	} else if (strcmp(orden, "remove") == 0){
+
+	} else if (strcmp(orden, "copy") == 0){
+
 	} else {
 		printf("ERROR: Comando %s no existe\n", orden);
 	}
@@ -226,8 +230,13 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 		}
 
 		//Liberar inodo
-
-		//Eliminar entrada
+		inodo->size_fichero = 0;
+		ext_superblock->s_free_inodes_count++;
+		ext_bytemaps->bmap_inodos[directorio[posFichero].dir_inodo] = 0;
+		ext_bytemaps->bmap_bloques[inodo->i_nbloque[i]] = 0;
+		//Eliminar entrada. Limpio nombre y inodo
+		memset(directorio[posFichero].dir_nfich,0,LEN_NFICH); 
+		directorio->dir_inodo = NULL_INODO;
 
 		//Actualiza los cambios
 	}
