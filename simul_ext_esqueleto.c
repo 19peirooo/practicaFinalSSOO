@@ -185,13 +185,24 @@ int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,  char *nombre
 
 int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *memdatos, char *nombre) {
 	int exito = 0;
-	
-	if (BuscaFich(directorio,inodos,nombre) == -1) {
-		printf("ERROR: Fichero no encontrado");
+	int posFichero = BuscaFich(directorio,inodos,nombre);
+	if (posFichero == -1) {
+		printf("ERROR: Fichero %s no encontrado\n", nombre);
 	} else {
-		
+		EXT_SIMPLE_INODE inodo = inodos->blq_inodos[directorio[posFichero].dir_inodo];
+		if (inodo.size_fichero == 0){
+			printf("ERROR: El fichero %s es vacio\n", nombre);
+		} else {
+			for (int i = 0; i < MAX_NUMS_BLOQUE_INODO; i++){
+				if (inodo.i_nbloque[i]  != NULL_BLOQUE) {
+					char* bloque = memdatos[inodo.i_nbloque[i]].dato;
+					printf("%s",bloque);
+				}
+			}
+			exito = 1;
+		}
 	}
-
+	printf("\n");
 	return exito;
 }
 
