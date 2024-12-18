@@ -122,6 +122,12 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 		} else {
 			printf("ERROR: Argumentos Insuficientes\n");
 		}
+	} else if (strcmp(orden, "salir") == 0){
+		if (numArgs == 1){
+			esComandoValido = 1;
+		} else {
+			printf("ERROR: Demasiados argumentos\n");
+		} 
 	} else {
 		printf("ERROR: Comando %s no existe\n", orden);
 	}
@@ -234,7 +240,7 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 		printf("ERROR: Fichero %s no encontrado\n", nombre);
 	} else {
 		//Liberacion de bloques
-		EXT_SIMPLE_INODE *inodo = &inodos.blq_inodos[directorio[posFichero].dir_inodo];
+		EXT_SIMPLE_INODE *inodo = &inodos->blq_inodos[directorio[posFichero].dir_inodo];
 		for (int i = 0; i < MAX_NUMS_BLOQUE_INODO; i++) {
 			if (inodo->i_nbloque[i] != NULL_BLOQUE){
 				ext_superblock->s_free_blocks_count++;
@@ -247,7 +253,7 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 		inodo->size_fichero = 0;
 		ext_superblock->s_free_inodes_count++;
 		ext_bytemaps->bmap_inodos[directorio[posFichero].dir_inodo] = 0;
-		ext_bytemaps->bmap_bloques[inodo->i_nbloque[i]] = 0;
+
 		//Eliminar entrada. Limpio nombre y inodo
 		memset(directorio[posFichero].dir_nfich,0,LEN_NFICH); 
 		directorio->dir_inodo = NULL_INODO;
@@ -259,7 +265,77 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 }
 
 int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
-	int exito = 0;
+	int exito = 1;
+	int posOrigen = BuscaFich(directorio,inodos,nombredestino);
+	int posDestino = BuscaFich(directorio,inodos,nombredestino);
+	int inodoLibre = -1;
+	int entradaLibre = -1;
+	int bloqueLibre = -1;
+	
+	if (posOrigen == -1) {
+		printf("ERROR: Fichero %s no encontrado\n", nombreorigen);
+		exito = 0;
+	} else if (posDestino != -1) {
+		printf("ERROR: Fichero %s ya existe\n", nombredestino);
+		exito = 0;
+	} else {
+		//Encuentro inodo libre
+		for (int i = 0; i < MAX_INODOS && inodoLibre == -1; i++) {
+			if (ext_bytemaps->bmap_inodos[i] == 0){
+				inodoLibre = i;
+				ext_bytemaps->bmap_inodos[inodoLibre] == 1;
+				ext_superblock->s_free_inodes_count--;
+			}
+		}
+
+		if (inodoLibre == -1) {
+			printf("ERROR: No hay inodos disponibles\n");
+			exito = 0;
+		} else {
+			//Encuentro entrada nueva
+			for (int i = 0; i < MAX_FICHEROS && inodoLibre == -1; i++) {
+				if (directorio[i].dir_inodo == NULL_INODO) {
+					entradaLibre = i;
+					strcpy(directorio[entradaLibre].dir_nfich,nombredestino);
+					directorio[entradaLibre].dir_nfich[LEN_NFICH - 1] = '\0';
+					directorio[entradaLibre].dir_inodo = inodoLibre;
+				}
+			}
+			if (entradaLibre == -1) {
+				printf("ERROR: No hay entradas disponibles\n");
+				exito = 0;
+			} else {
+				//Asigno bloques libres y copio los datos
+				EXT_SIMPLE_INODE *inodoOrigen = &inodos->blq_inodos[directorio[posOrigen].dir_inodo];
+				EXT_SIMPLE_INODE *inodoDestino = &inodos->blq_inodos[inodoLibre];
+				inodoDestino->size_fichero = inodoOrigen->size_fichero;
+
+				for (int i = 0; i < MAX_NUMS_BLOQUE_INODO; i++) {
+					if (inodoOrigen->i_nbloque[i] != NULL_BLOQUE) {
+						bloqueLibre = -1;
+						for (int j = PRIM_BLOQUE_DATOS; j < MAX_BLOQUES_PARTICION && bloqueLibre == -1; j++) {
+							if (ext_bytemaps->bmap_bloques[i] == 0){
+								bloqueLibre = i;
+								ext_bytemaps->bmap_inodos[bloqueLibre] == 1;
+								ext_superblock->s_free_inodes_count--;
+							}
+						}
+						if (bloqueLibre == -1) {
+							printf("ERROR: No hay bloques disponibles\n");
+							exito = 0;
+						} else {
+							//Copio datos
+							inodoDestino->i_nbloque[i] = bloqueLibre;
+							memcpy(memdatos[bloqueLibre].dato,memdatos[inodoOrigen->i_nbloque[i]].dato, SIZE_BLOQUE);
+						}
+					} else {
+						inodoDestino->i_nbloque[i] = NULL_BLOQUE;
+					}
+				}
+			}
+		}
+	}
+
 	return exito;
 }
 
@@ -291,7 +367,7 @@ void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich){
 
 	escritura = fwrite(ext_bytemaps, SIZE_BLOQUE,1,fich);
 	if (escritura != 1) {
-		printf("ERROR: No se ha podido escribir los bytemaps\n")
+		printf("ERROR: No se ha podido escribir los bytemaps\n");
 	}
 	fflush(fich);
 }
@@ -303,7 +379,7 @@ void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich){
 
 	escritura = fwrite(ext_superblock, SIZE_BLOQUE,1,fich);
 	if (escritura != 1) {
-		printf("ERROR: No se ha podido escribir el superbloque\n")
+		printf("ERROR: No se ha podido escribir el superbloque\n");
 	}
 	fflush(fich);
 
