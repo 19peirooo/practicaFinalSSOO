@@ -246,7 +246,11 @@ void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich){
 	return 0;
 }
 void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich){
-	return 0;
+	//Posicionamos el puntero en el bloque 0
+	fseek(fich,0,SEEK_SET);
+
+	fwrite(ext_superblock, SIZE_BLOQUE,1,fich);
+	fflush(fich);
 }
 void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
 	//Movemos el puntero al inicio del primer bloque
