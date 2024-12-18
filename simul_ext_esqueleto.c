@@ -100,7 +100,7 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 		if (argumento1 == NULL) {
 			printf("ERROR:  Argumentos Insuficientes\n");
 		} else if (argumento1 != NULL && argumento2 != NULL) {
-			printf("ERROR: Demasiados Argumentos")
+			printf("ERROR: Demasiados Argumentos");
 		} else {
 			esComandoValido = 1;
 		}
@@ -169,7 +169,7 @@ int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,  char *nombre
 				directorio[posFichero].dir_nfich[LEN_NFICH - 1] = '\0';	
 				exito = 1;
 			} else {
-				printf("ERROR: Nuevo nombre para el fichero es demasiado largo \n")
+				printf("ERROR: Nuevo nombre para el fichero es demasiado largo \n");
 			}
 			
 		} else {
@@ -187,12 +187,30 @@ int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *mem
 	int exito = 0;
 	
 	if (BuscaFich(directorio,inodos,nombre) == -1) {
-		printf("ERROR: Fichero")
+		printf("ERROR: Fichero no encontrado");
+	} else {
+		
 	}
 
 	return exito;
 }
 
 int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, char *nombre,  FILE *fich) {
-	
+	return 0;
+}
+
+int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
+	return 0;
+}
+void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich){
+	return 0;
+}
+void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich){
+	return 0;
+}
+void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich){
+	return 0;
+}
+void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
+	return 0;
 }
