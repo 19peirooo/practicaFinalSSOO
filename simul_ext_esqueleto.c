@@ -76,37 +76,39 @@ int main(int argc , char** argv) {
 
 int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argumento2){
 	int esComandoValido = 0;
-	sscanf(strcomando, "%s %s %s", orden, argumento1, argumento2);
+	int numArgs = sscanf(strcomando, "%s %s %s", orden, argumento1, argumento2);
 
 	if (strcmp(orden, "info") == 0){
-		if (argumento1 == NULL && argumento2 == NULL){
+		if (numArgs == 1){
 			esComandoValido = 1;
 		} else {
 			printf("ERROR: Demasiados argumentos\n");
  		}
 	} else if (strcmp(orden, "dir") == 0){
-		if (argumento1 == NULL && argumento2 == NULL){
+		if (numArgs == 1){
 			esComandoValido = 1;
 		} else {
 			printf("ERROR: Demasiados argumentos\n");
 		} 
 	} else if (strcmp(orden, "rename") == 0) {
-		if ((argumento1 != NULL && argumento2 != NULL)) {
+		if ((numArgs == 3)) {
 			esComandoValido = 1;
 		} else {
 			printf("ERROR: Argumentos Insuficientes\n");
 		}
 	} else if (strcmp(orden, "imprimir") == 0) {
-		if (argumento1 == NULL) {
+		if (numArgs == 1) {
 			printf("ERROR:  Argumentos Insuficientes\n");
-		} else if (argumento1 != NULL && argumento2 != NULL) {
-			printf("ERROR: Demasiados Argumentos");
+		} else if (numArgs == 3) {
+			printf("ERROR: Demasiados Argumentos\n");
 		} else {
 			esComandoValido = 1;
 		}
+	} else {
+		printf("ERROR: Comando %s no existe\n", orden);
 	}
 
-	return esComandoValido;
+	return esComandoValido;s
 }
 
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
