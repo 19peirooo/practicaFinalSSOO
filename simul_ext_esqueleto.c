@@ -241,7 +241,23 @@ int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 }
 
 void Grabarinodosydirectorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, FILE *fich){
+	int escritura = 0;
+	//Posiciono el puntero en el bloque 2 para los inodos
+	fseek(fich,2*SIZE_BLOQUE,SEEK_SET);
 
+	escritura = fwrite(inodos,SIZE_BLOQUE,1,fich);
+	if (escritura != 1) {
+		printf("ERROR: No se ha podido escribir la lista de inodos\n");
+	}
+	//Posiciono el puntero en el bloque 3 para el directorio
+	fseek(fich,3*SIZE_BLOQUE,SEEK_SET);
+
+	escritura = fwrite(directorio,SIZE_BLOQUE,1,fich);
+	if (escritura != 1) {
+		printf("ERROR: No se ha podido escribir el directorio\n");
+	}
+
+	fflush(fich);
 }
 
 void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich){
@@ -252,7 +268,7 @@ void GrabarByteMaps(EXT_BYTE_MAPS *ext_bytemaps, FILE *fich){
 
 	escritura = fwrite(ext_bytemaps, SIZE_BLOQUE,1,fich);
 	if (escritura != 1) {
-		printf("ERROR: No se ha podido escribir los bytemaps")
+		printf("ERROR: No se ha podido escribir los bytemaps\n")
 	}
 	fflush(fich);
 }
@@ -264,14 +280,14 @@ void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich){
 
 	escritura = fwrite(ext_superblock, SIZE_BLOQUE,1,fich);
 	if (escritura != 1) {
-		printf("ERROR: No se ha podido escribir el superbloque")
+		printf("ERROR: No se ha podido escribir el superbloque\n")
 	}
 	fflush(fich);
 
 }
 
 void GrabarDatos(EXT_DATOS *memdatos, FILE *fich){
-	//Movemos el puntero al inicio del primer bloque
+	//Movemos el puntero al inicio del primer bloque de datos
 	fseek(fich,PRIM_BLOQUE_DATOS * SIZE_BLOQUE, SEEK_SET);
 
 	//Escribimos los datos
