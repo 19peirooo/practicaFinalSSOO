@@ -183,12 +183,12 @@ void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps) {
 }
 
 void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos) {
-	for (int i = 0; i < MAX_FICHEROS; i++){
+	for (int i = 0; i < MAX_FICHEROS - 1; i++){
 		if (directorio[i].dir_inodo != NULL_INODO) {
-			printf("Nombre: %s, Tamaño: %d, inodo: %u, Bloques: ",
+			printf("Nombre: %s, Tamaño: %d, inodo: %d, Bloques: ",
 			directorio[i].dir_nfich, 
 			inodos->blq_inodos[directorio[i].dir_inodo].size_fichero,
-			inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque);
+			directorio[i].dir_inodo);
 			for (int j = 0; j < MAX_NUMS_BLOQUE_INODO; j++) {
 				if (inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j] != NULL_BLOQUE) {
 					printf("%d ", inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque[j]);
@@ -282,7 +282,7 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 
 		//Eliminar entrada. Limpio nombre y inodo
 		memset(directorio[posFichero].dir_nfich,0,LEN_NFICH); 
-		directorio->dir_inodo = NULL_INODO;
+		directorio[posFichero].dir_inodo = NULL_INODO;
 
 	}
 
