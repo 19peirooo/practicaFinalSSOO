@@ -52,6 +52,7 @@ int main(int argc , char** argv) {
 			printf (">> ");
 			fflush(stdin);
 			fgets(comando, LONGITUD_COMANDO, stdin);
+			comando[strcspn(comando, "\n")] = '\0';
 		} while (ComprobarComando(comando,orden,argumento1,argumento2) == 0);
 
 		if (strcmp(orden,"info") == 0) {
@@ -65,16 +66,13 @@ int main(int argc , char** argv) {
 			continue;
 		} else if (strcmp(orden,"rename") == 0) {
 			Renombrar(&directorio,&ext_blq_inodos,argumento1,argumento2);
-			continue;
 		} else if (strcmp(orden,"imprimir") == 0) {
 			Imprimir(&directorio, &ext_blq_inodos, &memdatos, argumento1);
 			continue;
 		} else if (strcmp(orden,"remove") == 0) {
-			Borrar(&directorio, &ext_blq_inodos, &ext_bytemaps, &ext_superblock, argumento1);
-			continue;
+			Borrar(&directorio, &ext_blq_inodos, &ext_bytemaps, &ext_superblock, argumento1,fent);
 		} else if (strcmp(orden,"copy") == 0) {
-			Copiar(&directorio,&ext_blq_inodos,&ext_bytemaps,&ext_superblock,&memdatos,argumento1,argumento2);
-			continue;
+			Copiar(&directorio,&ext_blq_inodos,&ext_bytemaps,&ext_superblock,&memdatos,argumento1,argumento2,fent);
 		} 
         // Escritura de metadatos en comandos rename, remove, copy     
     	Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
@@ -342,7 +340,7 @@ int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 					if (inodoOrigen->i_nbloque[i] != NULL_BLOQUE) {
 						bloqueLibre = -1;
 						for (int j = PRIM_BLOQUE_DATOS; j < MAX_BLOQUES_PARTICION && bloqueLibre == -1; j++) {
-							if (ext_bytemaps->bmap_bloques[i] == 0){
+							if (ext_bytemaps->bmap_bloques[j] == 0){
 								bloqueLibre = j;
 								ext_bytemaps->bmap_bloques[bloqueLibre] = 1;
 								ext_superblock->s_free_inodes_count--;
