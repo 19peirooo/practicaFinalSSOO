@@ -52,11 +52,16 @@ int main(int argc , char** argv) {
 			printf (">> ");
 			fflush(stdin);
 			fgets(comando, LONGITUD_COMANDO, stdin);
-		} while (ComprobarComando(comando,orden,argumento1,argumento2) !=0);
-		if (strcmp(orden,"dir")==0) {
+		} while (ComprobarComando(comando,orden,argumento1,argumento2) == 0);
+
+		if (strcmp(orden,"info") == 0) {
+			LeeSuperBloque(&ext_superblock);
+		} else if (strcmp(orden,"dir") == 0) {
 			Directorio(&directorio,&ext_blq_inodos);
             continue;
-        }
+        } else if (strcmp(orden,"bytemaps") == 0) {
+			Printbytemaps(&ext_bytemaps);
+		}
         // Escritura de metadatos en comandos rename, remove, copy     
     	Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
     	GrabarByteMaps(&ext_bytemaps,fent);
@@ -76,6 +81,7 @@ int main(int argc , char** argv) {
 
 int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argumento2){
 	int esComandoValido = 0;
+	strcomando[strcspn(strcomando, "\n")] = '\0';
 	int numArgs = sscanf(strcomando, "%s %s %s", orden, argumento1, argumento2);
 
 	if (strcmp(orden, "info") == 0){
@@ -89,7 +95,13 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 			esComandoValido = 1;
 		} else {
 			printf("ERROR: Demasiados argumentos\n");
-		} 
+		}
+	} else if (strcmp(orden, "bytemaps") == 0){
+		if (numArgs == 1){
+			esComandoValido = 1;
+		} else {
+			printf("ERROR: Demasiados argumentos\n");
+		}
 	} else if (strcmp(orden, "rename") == 0) {
 		if (numArgs == 3) {
 			esComandoValido = 1;
@@ -122,12 +134,12 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 		} else {
 			printf("ERROR: Argumentos Insuficientes\n");
 		}
-	} else if (strcmp(orden, "salir") == 0){
-		if (numArgs == 1){
+	} else if (strcmp(orden,"salir") == 0) {
+		if (numArgs == 1) {
 			esComandoValido = 1;
 		} else {
-			printf("ERROR: Demasiados argumentos\n");
-		} 
+			printf("ERROR: Demasiados Argumentos\n");
+		}
 	} else {
 		printf("ERROR: Comando %s no existe\n", orden);
 	}
@@ -136,12 +148,14 @@ int ComprobarComando(char* strcomando, char* orden, char* argumento1, char* argu
 }
 
 void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
-	printf("Informacion del Superbloque: ");
-	printf("Inodos: %d\n", psup->s_inodes_count);
-	printf("Bloques: %d\n", psup->s_blocks_count);
-	printf("Bloques Libres: &d\n", psup->s_free_blocks_count);
-	printf("Primer Bloque: %d\n", psup->s_first_data_block);
+	printf("Informacion del Superbloque: \n");
 	printf("Tamaño del Bloque: %d\n", psup->s_block_size);
+	printf("Inodos: %d\n", psup->s_inodes_count);
+	printf("Inodos Libres: %d\n", psup->s_free_inodes_count);
+	printf("Bloques: %d\n", psup->s_blocks_count);
+	printf("Bloques Libres: %d\n", psup->s_free_blocks_count);
+	printf("Primer Bloque: %d\n", psup->s_first_data_block);
+	
 }
 
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps) {
@@ -157,9 +171,9 @@ void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps) {
 }
 
 void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos) {
-	for (int i = 0; i < MAX_FICHEROS; i++){
-		if (directorio->dir_inodo != NULL_INODO) {
-			printf("Nombre: %s, Tamaño: %d, inodo: %d, Bloques: ",
+	for (int i = 0; i < MAX_FICHEROS - 1; i++){
+		if (directorio[i].dir_inodo != NULL_INODO) {
+			printf("Nombre: %s, Tamaño: %d, inodo: %u, Bloques: ",
 			directorio[i].dir_nfich, 
 			inodos->blq_inodos[directorio[i].dir_inodo].size_fichero,
 			inodos->blq_inodos[directorio[i].dir_inodo].i_nbloque);
