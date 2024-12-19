@@ -61,6 +61,8 @@ int main(int argc , char** argv) {
             continue;
         } else if (strcmp(orden,"bytemaps") == 0) {
 			Printbytemaps(&ext_bytemaps);
+		} else if (strcmp(orden,"rename") == 0) {
+			Renombrar(&directorio,&ext_blq_inodos,argumento1,argumento2);
 		}
         // Escritura de metadatos en comandos rename, remove, copy     
     	Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
@@ -159,11 +161,11 @@ void LeeSuperBloque(EXT_SIMPLE_SUPERBLOCK *psup){
 }
 
 void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps) {
-    printf("Bytemap de bloques:\n");
+    printf("Bytemap de bloques: ");
     for (int i = 0; i < 25; i++) {
         printf("%d ", ext_bytemaps->bmap_bloques[i]);
     }
-    printf("\nBytemap de inodos:\n");
+    printf("\nBytemap de inodos [0-25]: ");
     for (int i = 0; i < MAX_INODOS; i++) {
         printf("%d ", ext_bytemaps->bmap_inodos[i]);
     }
@@ -203,7 +205,7 @@ int Renombrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos,  char *nombre
 	int exito = 0;
 	int posFichero = BuscaFich(directorio,inodos,nombreantiguo);
 	if (posFichero != -1){
-		if (BuscaFich(directorio,inodos,nombreantiguo) == -1) {
+		if (BuscaFich(directorio,inodos,nombrenuevo) == -1) {
 			if (strlen(nombrenuevo) < LEN_NFICH) {
 				strcpy(directorio[posFichero].dir_nfich,nombrenuevo);
 				directorio[posFichero].dir_nfich[LEN_NFICH - 1] = '\0';	
