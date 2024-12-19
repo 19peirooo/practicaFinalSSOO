@@ -56,14 +56,26 @@ int main(int argc , char** argv) {
 
 		if (strcmp(orden,"info") == 0) {
 			LeeSuperBloque(&ext_superblock);
+			continue;
 		} else if (strcmp(orden,"dir") == 0) {
 			Directorio(&directorio,&ext_blq_inodos);
             continue;
         } else if (strcmp(orden,"bytemaps") == 0) {
 			Printbytemaps(&ext_bytemaps);
+			continue;
 		} else if (strcmp(orden,"rename") == 0) {
 			Renombrar(&directorio,&ext_blq_inodos,argumento1,argumento2);
-		}
+			continue;
+		} else if (strcmp(orden,"imprimir") == 0) {
+			Imprimir(&directorio, &ext_blq_inodos, &memdatos, argumento1);
+			continue;
+		} else if (strcmp(orden,"remove") == 0) {
+			Borrar(&directorio, &ext_blq_inodos, &ext_bytemaps, &ext_superblock, argumento1);
+			continue;
+		} else if (strcmp(orden,"copy") == 0) {
+			Copiar(&directorio,&ext_blq_inodos,&ext_bytemaps,&ext_superblock,&memdatos,argumento1,argumento2);
+			continue;
+		} 
         // Escritura de metadatos en comandos rename, remove, copy     
     	Grabarinodosydirectorio(&directorio,&ext_blq_inodos,fent);
     	GrabarByteMaps(&ext_bytemaps,fent);
@@ -173,7 +185,7 @@ void Printbytemaps(EXT_BYTE_MAPS *ext_bytemaps) {
 }
 
 void Directorio(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos) {
-	for (int i = 0; i < MAX_FICHEROS - 1; i++){
+	for (int i = 0; i < MAX_FICHEROS; i++){
 		if (directorio[i].dir_inodo != NULL_INODO) {
 			printf("Nombre: %s, Tamaño: %d, inodo: %u, Bloques: ",
 			directorio[i].dir_nfich, 
@@ -282,7 +294,7 @@ int Borrar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 
 int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *ext_bytemaps, EXT_SIMPLE_SUPERBLOCK *ext_superblock, EXT_DATOS *memdatos, char *nombreorigen, char *nombredestino,  FILE *fich){
 	int exito = 1;
-	int posOrigen = BuscaFich(directorio,inodos,nombredestino);
+	int posOrigen = BuscaFich(directorio,inodos,nombreorigen);
 	int posDestino = BuscaFich(directorio,inodos,nombredestino);
 	int inodoLibre = -1;
 	int entradaLibre = -1;
@@ -299,7 +311,7 @@ int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 		for (int i = 0; i < MAX_INODOS && inodoLibre == -1; i++) {
 			if (ext_bytemaps->bmap_inodos[i] == 0){
 				inodoLibre = i;
-				ext_bytemaps->bmap_inodos[inodoLibre] == 1;
+				ext_bytemaps->bmap_inodos[inodoLibre] = 1;
 				ext_superblock->s_free_inodes_count--;
 			}
 		}
@@ -309,7 +321,7 @@ int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 			exito = 0;
 		} else {
 			//Encuentro entrada nueva
-			for (int i = 0; i < MAX_FICHEROS && inodoLibre == -1; i++) {
+			for (int i = 0; i < MAX_FICHEROS && entradaLibre == -1; i++) {
 				if (directorio[i].dir_inodo == NULL_INODO) {
 					entradaLibre = i;
 					strcpy(directorio[entradaLibre].dir_nfich,nombredestino);
@@ -331,8 +343,8 @@ int Copiar(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_BYTE_MAPS *e
 						bloqueLibre = -1;
 						for (int j = PRIM_BLOQUE_DATOS; j < MAX_BLOQUES_PARTICION && bloqueLibre == -1; j++) {
 							if (ext_bytemaps->bmap_bloques[i] == 0){
-								bloqueLibre = i;
-								ext_bytemaps->bmap_inodos[bloqueLibre] == 1;
+								bloqueLibre = j;
+								ext_bytemaps->bmap_bloques[bloqueLibre] = 1;
 								ext_superblock->s_free_inodes_count--;
 							}
 						}
