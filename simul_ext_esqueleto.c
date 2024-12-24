@@ -272,7 +272,7 @@ int Imprimir(EXT_ENTRADA_DIR *directorio, EXT_BLQ_INODOS *inodos, EXT_DATOS *mem
 			for (int i = 0; i < MAX_NUMS_BLOQUE_INODO; i++){
 				//Comprueba que un bloque asocioado al indod no sea nulo, que significa que no hay informacion sobre el.
 				if (inodo.i_nbloque[i]  != NULL_BLOQUE) {
-					char* bloque = memdatos[inodo.i_nbloque[i]].dato;
+					char* bloque = memdatos[inodo.i_nbloque[i] - PRIM_BLOQUE_DATOS].dato;
 					printf("%s",bloque);
 				}
 			}
