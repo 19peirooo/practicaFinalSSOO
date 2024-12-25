@@ -20,6 +20,7 @@ void GrabarSuperBloque(EXT_SIMPLE_SUPERBLOCK *ext_superblock, FILE *fich);
 void GrabarDatos(EXT_DATOS *memdatos, FILE *fich);
 
 int main(int argc , char** argv) {
+	
 	char comando[LONGITUD_COMANDO];
 	char orden[LONGITUD_COMANDO];
 	char argumento1[LONGITUD_COMANDO];
